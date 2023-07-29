@@ -1,4 +1,4 @@
-# %%
+##
 ###################! Imports ###################
 # ? String -> For Generating Password
 import string
@@ -51,7 +51,7 @@ def conSQL():
 
 ######? Encryption #####
 def encryption():
-    global fernet 
+    global fernet
 
     #####* Clearing The Screen #####
     ClearScreen()
@@ -100,10 +100,8 @@ def encryption():
 def ClearScreen():
     console = Console()
     system("clear" if OSName == "posix" else "cls")
-    console.print(
-        Panel.fit("[bold italic #77DDD4]Password Manager", padding=(0, 22))
-    )
-    
+    console.print(Panel.fit("[bold italic #77DDD4]Password Manager", padding=(0, 22)))
+
 
 ######? Loading bar ######
 def StatBar(time: float, desc: str):
@@ -236,7 +234,9 @@ def EditEntry(t):
             if email:
                 while True:
                     Email = text("What should the email be?").ask()
-                    cur.execute(rf"update {t} set Email='{Email}' where IndexNo={choice}")
+                    cur.execute(
+                        rf"update {t} set Email='{Email}' where IndexNo={choice}"
+                    )
                     break
             break
         ###? Username ###
@@ -308,7 +308,9 @@ def DelEntry(t):
         while True:
             cur.execute(rf"select Name from {t} where IndexNo={choice}")
             name = cur.fetchall()[0][0]
-            conf = confirm(f"Are you sure you want to delete the entry for {name}?").ask()
+            conf = confirm(
+                f"Are you sure you want to delete the entry for {name}?"
+            ).ask()
             if conf:
                 cur.execute(rf"delete from {t} where IndexNo={choice}")
                 conn.commit()
@@ -318,7 +320,9 @@ def DelEntry(t):
                 for _ in names:
                     Names.append(_[0])
                 for index, val in enumerate(Names):
-                    cur.execute(rf"update {t} set IndexNo={index + 1} where Name='{val}'")
+                    cur.execute(
+                        rf"update {t} set IndexNo={index + 1} where Name='{val}'"
+                    )
                 conn.commit()
                 ###? Confirmation ###
                 print(f"The entry for {name} has been successfully deleted!")
@@ -333,7 +337,6 @@ def DelEntry(t):
         print("There has been some unknown error causing the program to crash.")
         sleep(0.5)
         input("Please enter to continue...")
-
 
 
 ######? Copying Entry ######
