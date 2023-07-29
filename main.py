@@ -22,7 +22,7 @@ import pyperclip
 from cryptography.fernet import Fernet
 
 # ? Questionary -> For better command line interface
-from questionary import Style, password, select, text, confirm
+from questionary import Style, password, select, text, confirm, checkbox
 
 # ? Rich --> For a box and loading bar
 from rich import print
@@ -56,13 +56,10 @@ def encryption():
     #####* Clearing The Screen #####
     ClearScreen()
 
-    #####* Clearing The Screen #####
-    ClearScreen()
-
     while True:
         inp = confirm("Do you have an encryption key?").ask()
         if inp:
-            key = password("Enter the key: ")
+            key = password("Enter the key:").ask()
         elif inp == False:
             while True:
                 GenKey = confirm(
@@ -78,20 +75,14 @@ def encryption():
                     )
                     while True:
                         copyKey = confirm("Do you want to copy the key?").ask()
-                        if copyKey.lower():
+                        if copyKey:
                             pyperclip.copy(key)
                             break
-                        if copyKey.lower() == False:
+                        if copyKey == False:
                             break
                     break
                 else:
                     continue
-        else:
-            try:
-                fernet = Fernet(inp)
-                break
-            except:
-                continue
         fernet = Fernet(key)
         break
 
@@ -135,10 +126,11 @@ def GenPass(p):
                     string.ascii_letters + string.digits + string.punctuation
                 )
 
+            ClearScreen()
             print(f"Generated Password: {genop}")
             return genop
         elif gen == False:
-            return password(p)
+            return password(p).ask()
         else:
             print("Please only enter either yes or no.")
 
@@ -219,49 +211,35 @@ def EditEntry(t):
             raise AttributeError
 
         #####* Getting Values #####
+        opt = checkbox("What all do you want to edit?", ["Name", "Email", "Username", "Password"]).ask()
         ###? Name ###
-        while True:
-            name = confirm("Do you want to change the name?").ask()
-            if name:
-                while True:
-                    Name = text("What should the name be?").ask()
-                    cur.execute(rf"update {t} set Name='{Name}' where IndexNo={choice}")
-                    break
-            break
+        if "Name" in opt:
+            while True:
+                Name = text("What should the name be?").ask()
+                if Name == "":
+                    print("Name cannot be left empty.")
+                    continue
+                cur.execute(rf"update {t} set Name='{Name}' where IndexNo={choice}")
+                break
         ###? Email ###
-        while True:
-            email = confirm("Do you want to change the email?").ask()
-            if email:
-                while True:
-                    Email = text("What should the email be?").ask()
-                    cur.execute(
-                        rf"update {t} set Email='{Email}' where IndexNo={choice}"
-                    )
-                    break
-            break
+        if "Email" in opt:
+            Email = text("What should the email be?").ask()
+            cur.execute(
+                rf"update {t} set Email='{Email}' where IndexNo={choice}"
+            )
         ###? Username ###
-        while True:
-            username = confirm("Do you want to change the Username?").ask()
-            if username:
-                while True:
-                    Username = text("What should the username be?").ask()
-                    cur.execute(
-                        rf"update {t} set Username='{Username}' where IndexNo={choice}"
-                    )
-                    break
-            break
+        if "Username" in opt:
+            Username = text("What should the username be?").ask()
+            cur.execute(
+                rf"update {t} set Username='{Username}' where IndexNo={choice}"
+            )
         ###? Password ###
-        while True:
-            passwd = confirm("Do you want to change the password?").ask()
-            if passwd:
-                while True:
-                    Passwd = GenPass("What should the password be?")
-                    Passwd = fernet.encrypt(Passwd.encode())
-                    cur.execute(
-                        rf'update {t} set Password="{Passwd}" where IndexNo={choice}'
-                    )
-                    break
-            break
+        if "Password" in opt:
+            Passwd = GenPass("What should the password be?")
+            Passwd = fernet.encrypt(Passwd.encode())
+            cur.execute(
+                rf'update {t} set Password="{Passwd}" where IndexNo={choice}'
+            )
         if Name == "-" and Email == "-" and Username == "-" and Passwd == "-":
             print("The entry has not been modified.")
         else:
@@ -379,10 +357,9 @@ def CopyEntry(t):
                     ["Email", "Username", "Password"],
                 )
                 .ask()
-                .lower()
             )
             ###? Email ###
-            if conf == ["e", "email", "mail"]:
+            if conf == "Email":
                 cur.execute(rf"select Email from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0]
                 if result == "":
@@ -396,7 +373,7 @@ def CopyEntry(t):
                 break
 
             ###? Username ###
-            elif conf in ["u", "user", "username"]:
+            elif conf == "Username":
                 cur.execute(rf"select Username from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0]
                 if result == "":
@@ -410,7 +387,7 @@ def CopyEntry(t):
                 break
 
             ###? Password ###
-            elif conf in ["pass", "p", "password"]:
+            elif conf == "Password":
                 cur.execute(rf"select Password from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0][2:-1]
                 decPass = fernet.decrypt(result).decode("utf-8")
