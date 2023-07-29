@@ -1,3 +1,5 @@
 pyperclip           # * Used for copying strings to clipboard.
 pwinput             # * Used for hiding what is typed.
 cryptography        # * Used for encrypting passwords.
+rich                # * User for better CLI
+questionary         # * Used for better CLI 
