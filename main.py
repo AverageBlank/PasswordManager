@@ -7,7 +7,7 @@ import string
 from os import name as OSName, system
 
 # ? Random -> For Generating Password
-from random import choice as randchoice
+from random import choice as randChoice, shuffle as randShuffle
 
 # ? Time -> For Pausing the Script
 from time import sleep
@@ -18,11 +18,22 @@ from sqlite3 import connect
 # ? Pyperclip -> For Copying to Clipboard
 import pyperclip
 
+# ? Re --> For checking if characters exist in string
+from re import compile
+
 # ? Cryptography -> For encrpytion
 from cryptography.fernet import Fernet
 
 # ? Questionary -> For better command line interface
-from questionary import Style, password, select, text, confirm, checkbox, press_any_key_to_continue as cont
+from questionary import (
+    Style,
+    password,
+    select,
+    text,
+    confirm,
+    checkbox,
+    press_any_key_to_continue as cont,
+)
 
 # ? Rich --> For a box and loading bar
 from rich import print
@@ -130,7 +141,7 @@ def StatBar(time: float, desc: str):
 
 ######? Generating Passwords ######
 def GenPass(p):
-    genop = ""
+    genop = []
     while True:
         gen = confirm("Do you want to generate a password?", style=minimalStyle).ask()
         if gen:
@@ -146,10 +157,28 @@ def GenPass(p):
                     break
                 except:
                     print("Please enter a valid positive number.")
-            for _ in range(genlen):
-                genop += randchoice(
-                    string.ascii_letters + string.digits + "!#$%&()*+"
-                )
+            while True:
+                for _ in range(genlen):
+                    genop.append(
+                        randChoice(
+                            string.ascii_letters + string.digits + "@!_#$%^&*()<>?/}{~:"
+                        )
+                    )
+
+                regex = compile("[@!_#$%^&*()<>?/}{~:]")
+                if regex.search("".join(str(v) for v in genop)) == None:
+                    genop = []
+                    continue
+                if any(i.isdigit() for i in genop) == False:
+                    genop = []
+                    continue
+                if any(i.isalpha() for i in genop) == False:
+                    genop = []
+                    continue
+                break
+
+            randShuffle(genop)
+            genop = "".join(str(v) for v in genop)
 
             ClearScreen()
             print(f"Generated Password: {genop}")
@@ -389,6 +418,7 @@ def CopyEntry(t):
                 cur.execute(rf"select Email from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0]
                 if result == "":
+                    ClearScreen()
                     print(f"The email in {name} does not exist.")
                     continue
                 pyperclip.copy(result)
@@ -403,6 +433,7 @@ def CopyEntry(t):
                 cur.execute(rf"select Username from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0]
                 if result == "":
+                    ClearScreen()
                     print(f"The Username in {name} does not exist.")
                     continue
                 pyperclip.copy(result)
@@ -418,6 +449,7 @@ def CopyEntry(t):
                 result = cur.fetchall()[0][0][2:-1]
                 decPass = fernet.decrypt(result).decode("utf-8")
                 if result == "":
+                    ClearScreen()
                     print(f"The Password in {name} does not exist.")
                     continue
                 print(decPass)
@@ -452,6 +484,7 @@ def PrintOptions():
 
         #######? Calling Functions #######
         if choice == "Quit":
+            system("clear" if OSName == "posix" else "cls")
             quit()
         elif choice == "Add Entry":
             AddEntry(table)
