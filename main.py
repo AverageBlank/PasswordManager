@@ -22,7 +22,7 @@ import pyperclip
 from cryptography.fernet import Fernet
 
 # ? Questionary -> For better command line interface
-from questionary import Style, password, select, text, confirm, checkbox
+from questionary import Style, password, select, text, confirm, checkbox, press_any_key_to_continue as cont
 
 # ? Rich --> For a box and loading bar
 from rich import print
@@ -99,10 +99,10 @@ def ClearScreen():
     #####* For Questionary Style #####
     minimalStyle = Style(
         [
-            ("answer", "fg:#FFFFFF italic"),  # ? White
+            ("answer", "fg:#00FFFF italic"),  # ? White
             ("question", "fg:#FFFFFF bold"),  # ? White
             ("pointer", "fg:#00FFFF bold"),  # ? Cyan
-            ("highlighted", "fg:#FFFFFF"),  # ? White
+            ("highlighted", "fg:#00FFFF"),  # ? White
             ("selected", "fg:#A9A9A9"),  # ? Grey
             ("qmark", "fg:#77DD77"),  # ? Green
         ]
@@ -148,7 +148,7 @@ def GenPass(p):
                     print("Please enter a valid positive number.")
             for _ in range(genlen):
                 genop += randchoice(
-                    string.ascii_letters + string.digits + string.punctuation
+                    string.ascii_letters + string.digits + "!#$%&()*+"
                 )
 
             ClearScreen()
@@ -156,8 +156,6 @@ def GenPass(p):
             return genop
         elif gen == False:
             return password(p).ask()
-        else:
-            print("Please only enter either yes or no.")
 
 
 ######? Adding Entry ######
@@ -204,7 +202,7 @@ def AddEntry(t):
     )
     conn.commit()
     print(f"Entry for {name} has been successfully added!")
-    input("Please enter to continue...")
+    cont().ask()
 
 
 ######? Editting Entry ######
@@ -272,14 +270,14 @@ def EditEntry(t):
         else:
             conn.commit()
             print("The entry has been successfully modified!")
-        input("Please enter to continue...")
+        cont().ask()
     except AttributeError:
         PrintOptions()
     except:
         sleep(1)
         print("There has been some unknown error causing the program to crash.")
         sleep(0.5)
-        input("Please enter to continue...")
+        cont().ask()
 
 
 ######? Deleting Entry ######
@@ -334,7 +332,7 @@ def DelEntry(t):
                 conn.commit()
                 ###? Confirmation ###
                 print(f"The entry for {name} has been successfully deleted!")
-                input("Please enter to continue...")
+                cont().ask()
                 break
             elif conf == False:
                 break
@@ -344,7 +342,7 @@ def DelEntry(t):
         sleep(1)
         print("There has been some unknown error causing the program to crash.")
         sleep(0.5)
-        input("Please enter to continue...")
+        cont().ask()
 
 
 ######? Copying Entry ######
@@ -397,7 +395,7 @@ def CopyEntry(t):
                 sleep(1)
                 print("The email has been successfully copied to your clipboard!")
                 sleep(0.5)
-                input("Please enter to continue...")
+                cont().ask()
                 break
 
             ###? Username ###
@@ -411,7 +409,7 @@ def CopyEntry(t):
                 sleep(1)
                 print("The username has been successfully copied to your clipboard!")
                 sleep(0.5)
-                input("Please enter to continue...")
+                cont().ask()
                 break
 
             ###? Password ###
@@ -427,7 +425,7 @@ def CopyEntry(t):
                 sleep(1)
                 print("The password has been successfully copied to your clipboard")
                 sleep(0.5)
-                input("Please enter to continue...")
+                cont().ask()
                 break
     except AttributeError:
         PrintOptions()
@@ -435,7 +433,7 @@ def CopyEntry(t):
         sleep(1)
         print("Please enter the correct encryption key.")
         sleep(0.5)
-        input("Please enter to continue...")
+        cont().ask()
 
 
 ######? Printing Options ######
