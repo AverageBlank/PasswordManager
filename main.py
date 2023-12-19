@@ -15,6 +15,7 @@ from time import sleep
 # ? SQLite3 -> For Connecting to MySQL
 from sqlite3 import connect
 
+
 # ? Pyperclip -> For Copying to Clipboard
 import pyperclip
 
@@ -22,7 +23,7 @@ import pyperclip
 from re import compile
 
 # ? Cryptography -> For encrpytion
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 
 # ? Questionary -> For better command line interface
 from questionary import (
@@ -64,20 +65,20 @@ def conSQL():
 def encryption():
     global fernet
 
-    #####* Clearing The Screen #####
-    ClearScreen()
-
     while True:
+        #####* Clearing The Screen #####
+        ClearScreen()
+
         inp = confirm("Do you have an encryption key?", style=minimalStyle).ask()
         if inp:
             key = password("Enter the key:", style=minimalStyle).ask()
-        elif inp == False:
+        else:
             while True:
                 GenKey = confirm(
                     "Do you want to generate a key?\n[You will lose access to previous data]",
                     style=minimalStyle,
                 ).ask()
-                if GenKey == False:
+                if GenKey is False:
                     exit()
                 elif GenKey:
                     key = Fernet.generate_key()
@@ -91,14 +92,15 @@ def encryption():
                         ).ask()
                         if copyKey:
                             pyperclip.copy(key)
-                            break
-                        if copyKey == False:
-                            break
+                        break
                     break
                 else:
                     continue
-        fernet = Fernet(key)
-        break
+        try:
+            fernet = Fernet(key)
+            break
+        except ValueError:
+            print("The key you entered is invalid.")
 
 
 ######? Clear Screen #####
@@ -134,7 +136,7 @@ def StatBar(time: float, desc: str):
         TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
     )
     with progress_bar as p:
-        for i in p.track(range(100), description=desc):
+        for _ in p.track(range(100), description=desc):
             sleep(time / 100)
     sleep(0.5)
 
@@ -155,7 +157,7 @@ def GenPass(p):
                     if genlen <= 0:
                         raise ValueError
                     break
-                except:
+                except ValueError or TypeError:
                     print("Please enter a valid positive number.")
             while True:
                 for _ in range(genlen):
@@ -166,13 +168,13 @@ def GenPass(p):
                     )
 
                 regex = compile("[@!_#$%^&*()<>?/}{~:]")
-                if regex.search("".join(str(v) for v in genop)) == None:
+                if regex.search("".join(str(v) for v in genop)) is None:
                     genop = []
                     continue
-                if any(i.isdigit() for i in genop) == False:
+                if any(i.isdigit() for i in genop) is False:
                     genop = []
                     continue
-                if any(i.isalpha() for i in genop) == False:
+                if any(i.isalpha() for i in genop) is False:
                     genop = []
                     continue
                 break
@@ -183,7 +185,7 @@ def GenPass(p):
             ClearScreen()
             print(f"Generated Password: {genop}")
             return genop
-        elif gen == False:
+        elif gen is False:
             return password(p).ask()
 
 
@@ -302,11 +304,6 @@ def EditEntry(t):
         cont().ask()
     except AttributeError:
         PrintOptions()
-    except:
-        sleep(1)
-        print("There has been some unknown error causing the program to crash.")
-        sleep(0.5)
-        cont().ask()
 
 
 ######? Deleting Entry ######
@@ -363,15 +360,10 @@ def DelEntry(t):
                 print(f"The entry for {name} has been successfully deleted!")
                 cont().ask()
                 break
-            elif conf == False:
+            elif conf is False:
                 break
     except AttributeError:
         PrintOptions()
-    except:
-        sleep(1)
-        print("There has been some unknown error causing the program to crash.")
-        sleep(0.5)
-        cont().ask()
 
 
 ######? Copying Entry ######
@@ -461,7 +453,7 @@ def CopyEntry(t):
                 break
     except AttributeError:
         PrintOptions()
-    except:
+    except InvalidToken:
         sleep(1)
         print("Please enter the correct encryption key.")
         sleep(0.5)
@@ -512,3 +504,4 @@ if __name__ == "__main__":
 
     #####* Printing Options #####
     PrintOptions()
+
