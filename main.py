@@ -15,7 +15,6 @@ from time import sleep
 # ? SQLite3 -> For Connecting to MySQL
 from sqlite3 import connect
 
-
 # ? Pyperclip -> For Copying to Clipboard
 import pyperclip
 
