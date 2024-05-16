@@ -455,7 +455,6 @@ def CopyEntry(t):
     except InvalidToken:
         sleep(1)
         print("Please enter the correct encryption key.")
-        sleep(0.5)
         cont().ask()
 
 
@@ -503,4 +502,3 @@ if __name__ == "__main__":
 
     #####* Printing Options #####
     PrintOptions()
-
