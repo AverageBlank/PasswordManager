@@ -7,7 +7,7 @@ The Password Manager is a secure and efficient solution for storing and managing
 The purpose of the Password Manager project is to offer a practical tool for managing passwords securely, leveraging SQLite3 for robust database operations and the `cryptography` library for encryption. By using this system, users can experience secure password storage, quick retrieval, and the convenience of a user-friendly command-line interface built with `questionary` and `rich`. This project aims to provide a valuable utility for everyday password management while showcasing the application of encryption and database management techniques.
 
 ## Preview
--- To Be Added --
+https://github.com/AverageBlank/PasswordManager/assets/112507212/ba5cee30-9837-4dd5-ae4b-e79f5e2c8b07
 
 ## Setting Up Locally
 
