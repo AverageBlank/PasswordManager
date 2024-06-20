@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    {% if current_user.is_authenticated %}
+    <h1>Hello {% current_user.username %}</h1>
+    {% endif %}
+  </body>
+</html>

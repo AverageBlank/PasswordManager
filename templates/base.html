@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="/static/favicon.svg" />
+    <title>{%block title %} {% endblock %} - trim.lol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Sora:wght@100..800&display=swap");
+      * {
+        font-family: "Sora", "Helvetica Neue", sans-serif;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-950">
+    {% block content %}{% endblock %}
+  </body>
+</html>
