@@ -1,0 +1,126 @@
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #a06cfc 40%, #3faffa 60%); /* 40/60 gradient between purple and blue */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  background-color: #fff;
+  padding: 50px;
+  border-radius: 10px;
+  border: 3px solid #6c2fd1; /* Dark purple border for the container */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+  width: 562px;
+  background: linear-gradient(135deg, #f9f9f9, #e0f2f1); /* Light gradient for container */
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333; /* Darker color for the heading */
+}
+
+input {
+  width: 100%;
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 8px;
+  border: 2px solid #6c2fd1; /* Dark purple border for inputs */
+  box-sizing: border-box;
+  background-color: #e8eaf6; /* Light purple background for inputs */
+}
+
+input:focus {
+  border-color: #3faffa; /* Blue border on focus */
+  background-color: #ffffff; /* White background on focus */
+}
+
+button {
+  width: 100%;
+  padding: 16px;
+  background-color: #3faffa; /* Blue background for button */
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2a78d6; /* Darker blue on hover */
+}
+
+.signup-link {
+  display: block;
+  text-align: right;
+  margin: 16px 0;
+  color: #6c2fd1; /* Dark purple color for the link */
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.signup-link:hover {
+  text-decoration: underline; /* Underline on hover */
+  color: #5a1f9a; /* Darker purple on hover */
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 30px;
+    width: 90%; /* Adjust width for smaller screens */
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+  
+  input {
+    padding: 14px; /* Adjust padding for smaller screens */
+    margin: 14px 0;
+  }
+  
+  button {
+    padding: 14px;
+    font-size: 16px;
+  }
+  
+  .signup-link {
+    font-size: 14px; /* Smaller font size for links */
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 20px;
+    width: 100%; /* Full width for very small screens */
+  }
+  
+  h2 {
+    margin-bottom: 15px;
+  }
+  
+  input {
+    padding: 12px; /* Further adjusted padding */
+    margin: 12px 0;
+  }
+  
+  button {
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .signup-link {
+    font-size: 12px; /* Even smaller font size for links */
+  }
+}

@@ -5,7 +5,7 @@
 # region credits
 # * ---- Made by:
 # * ------- Aaloke Eppalapalli
-# * ------- Husain Khorakiwala
+# * ------- Sarvesh Srinath
 
 # * ---- Source Code:
 # * ------- https://github.com/AverageBlank/URLShortener

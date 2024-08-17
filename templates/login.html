@@ -4,19 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sign In</title>
-
-    <style>
-      .errorTrue {
-        display: block !important;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='login.css') }}" />
   </head>
   <body>
-    <form method="post">
-      <input placeholder="username" type="text" name="username" />
-      <input placeholder="password" type="password" name="password" />
-      <button type="submit">Sign in</button>
-    </form>
-    <p class="{{errorTrue}}" style="display: none">{{errorValue}}</p>
+    <div class="container">
+      <h2>Sign In</h2>
+      <form method="post">
+        <input
+          placeholder="Username"
+          type="text"
+          name="username"
+          id="username" />
+        <input
+          placeholder="Password"
+          type="password"
+          name="password"
+          id="password" />
+        <a href="/signup" class="signup-link">Sign Up</a>
+        <!-- Blue hyperlink -->
+        <button type="submit">Sign In</button>
+        <p class="error {{errorTrue}}">{{errorValue}}</p>
+      </form>
+    </div>
   </body>
 </html>
