@@ -1,6 +1,7 @@
 # To-do 
 
 - ~~Make a function for registration~~
+- Convert Registration to email.
 - Make a function for login
 - Add Confirm password for registration
 - Add that google robot thing if possible

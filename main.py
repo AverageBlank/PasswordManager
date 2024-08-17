@@ -1,10 +1,18 @@
-##
-###################! Imports ###################
+# ? Flask --> For the backend of HTML
+from flask import (
+    Flask,
+    render_template,
+    make_response,
+    request,
+    redirect,
+    url_for,
+)
+
 # ? String -> For Generating Password
 import string
 
 # ? OS -> For Running Commands
-from os import name as OSName, system
+from os import name as OSName, system, environ
 
 # ? Random -> For Generating Password
 from random import choice as randChoice, shuffle as randShuffle
@@ -12,8 +20,13 @@ from random import choice as randChoice, shuffle as randShuffle
 # ? Time -> For Pausing the Script
 from time import sleep
 
+# ? Datetime
+from datetime import datetime
+
 # ? SQLite3 -> For Connecting to MySQL
 from sqlite3 import connect
+from pymongo import MongoClient
+from dotenv import load_dotenv
 
 # ? Pyperclip -> For Copying to Clipboard
 import pyperclip
@@ -24,49 +37,51 @@ from re import compile
 # ? Cryptography -> For encrpytion
 from cryptography.fernet import Fernet, InvalidToken
 
-# ? Questionary -> For better command line interface
-from questionary import (
-    Style,
-    password,
-    select,
-    text,
-    confirm,
-    checkbox,
-    press_any_key_to_continue as cont,
-)
-
-# ? Rich --> For a box and loading bar
-from rich import print
-from rich.console import Console
-
-from rich.panel import Panel
-from rich.progress import (
-    BarColumn,
-    Progress,
-    TextColumn,
-)
-
-
 ###################! Functions ###################
 ######? Connecting to SQLite3 #####
-def conSQL():
-    global conn, cur, table
-    conn = connect("Manager.db")
-    cur = conn.cursor()
-    #####* Checking if table exists
-    table = "passwords"
-    cur.execute(
-        rf"Create table if not exists {table}(IndexNo int, Name varchar(244), Email varchar(244), Username varchar(244), Password varchar(244))"
-    )
+conn = connect("Manager.db")
+cur = conn.cursor()
+#####* Checking if table exists
+table = "passwords"
+
+
+# ? Required.
+app = Flask(__name__)
+app.config["SECRET_KEY"] = environ.get("SECRET_KEY")
+app.config["MONGO_URI"] = environ.get("link")
+domain = "https://pass.aaloke.com/"
+hasUsedApp = False
+
+# ? Connecting to the Mongo DB Database
+load_dotenv()
+mongoLink = environ.get("link")
+client = MongoClient(mongoLink)
+db = client["PassManager"]
+
+# ? Connecting to Collections
+passColl = db["urls"]
+usersColl = db["users"]
+
+# ? Create indexes (if needed)
+passColl.create_index("ID", unique=True)
+passColl.create_index("Timestamp")
+passColl.create_index("Name")
+passColl.create_index("Email/Username")
+passColl.create_index("Password")
+passColl.create_index("UserID")
+
+usersColl.create_index("ID", unique=True)
+usersColl.create_index("UserID", unique=True)
+usersColl.create_index("Key", unique=True)
+print("Successfully connected to MongoDB.")
 
 
 ######? Encryption #####
-def encryption():
+def encryption():  # TODO
     global fernet
 
     while True:
         #####* Clearing The Screen #####
-        ClearScreen()
 
         inp = confirm("Do you have an encryption key?", style=minimalStyle).ask()
         if inp:
@@ -102,46 +117,8 @@ def encryption():
             print("The key you entered is invalid.")
 
 
-######? Clear Screen #####
-def ClearScreen():
-    global minimalStyle
-    #####* For Rich #####
-    console = Console()
-
-    #####* For Questionary Style #####
-    minimalStyle = Style(
-        [
-            ("answer", "fg:#00FFFF italic"),  # ? White
-            ("question", "fg:#FFFFFF bold"),  # ? White
-            ("pointer", "fg:#00FFFF bold"),  # ? Cyan
-            ("highlighted", "fg:#00FFFF"),  # ? White
-            ("selected", "fg:#A9A9A9"),  # ? Grey
-            ("qmark", "fg:#77DD77"),  # ? Green
-        ]
-    )
-
-    #####* Clearing the Screen #####
-    system("clear" if OSName == "posix" else "cls")
-
-    #####* Printing Password Manager #####
-    console.print(Panel.fit("[bold italic #77DDD4]Password Manager", padding=(0, 22)))
-
-
-######? Loading bar ######
-def StatBar(time: float, desc: str):
-    progress_bar = Progress(
-        TextColumn(f"{desc} "),
-        BarColumn(),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
-    )
-    with progress_bar as p:
-        for _ in p.track(range(100), description=desc):
-            sleep(time / 100)
-    sleep(0.5)
-
-
 ######? Generating Passwords ######
-def GenPass(p):
+def GenPass(p):  # TODO
     genop = []
     while True:
         gen = confirm("Do you want to generate a password?", style=minimalStyle).ask()
@@ -181,7 +158,6 @@ def GenPass(p):
             randShuffle(genop)
             genop = "".join(str(v) for v in genop)
 
-            ClearScreen()
             print(f"Generated Password: {genop}")
             return genop
         elif gen is False:
@@ -191,48 +167,45 @@ def GenPass(p):
 ######? Adding Entry ######
 def AddEntry(t):
     #####* Variables #####
-    result = []
-    NameResult = []
+    result = passColl.count_documents({})
 
-    #####* Clearing the Screen #####
-    ClearScreen()
-
-    #####* Going Through Table #####
-    cur.execute(rf"select * from {t}")
-    res = cur.fetchall()
-    for _ in res:
-        result.append(_)
-    cur.execute(rf"select Name from {t}")
-    res = cur.fetchall()
-    if len(res) != 0:
-        for _ in res:
-            _ = _[0].lower()
-            NameResult.append(_)
+    temp = passColl.find({}, {"Name": 1, "_id": 0})
+    names = [doc["Name"] for doc in temp if "Name" in doc]
 
     #####* Getting Values #####
     while True:
-        name = text(
-            "What do you want the entry to be called?", style=minimalStyle
-        ).ask()
+        # name = text(
+        #     "What do you want the entry to be called?", style=minimalStyle
+        # ).ask()
+        # Aaloke implement this.
+        name = ""
         if name == "":
             print("Name cannot be left empty.")
+            # Aaloke return error..
             continue
-        if name.lower() in NameResult:
+        if name.lower() in names:
             print("That name already exists.")
+            # Aaloke return error..
             continue
         break
-    email = text("Enter Email ID [Optional]:", style=minimalStyle).ask()
-    usrname = text("Enter Username [Optional]:", style=minimalStyle).ask()
-    passwd = GenPass("Enter Password:")
-    passwd = fernet.encrypt(passwd.encode())
+    # email = text("Enter Email ID [Optional]:", style=minimalStyle).ask() # Aaloke
+    emailUsername = ""
+    passwd = GenPass()
+    passwd = fernet.encrypt(passwd.encode())  # TODO TO BE FIXED
+    now = datetime.now()
+    time = now.strftime("%d/%m/%Y %H:%M:%S")
+    userID = ""  # Aaloke set this up.
 
     #####* Adding Values to Table #####
-    cur.execute(
-        rf'insert into {t} values({len(result) + 1}, "{name}", "{email}", "{usrname}", "{passwd}")'
-    )
-    conn.commit()
-    print(f"Entry for {name} has been successfully added!")
-    cont().ask()
+    values = {
+        "ID": len(result) + 1,
+        "Timestamp": time,
+        "Name": name,
+        "Email/Username": emailUsername,
+        "Password": passwd,
+        "UserID": userID,
+    }
+    passColl.insert_one(values)
 
 
 ######? Editting Entry ######
@@ -254,7 +227,6 @@ def EditEntry(t):
 
         #####* Printing Options #####
         ###? Clearing the Screen ###
-        ClearScreen()
 
         ###? Options ###
         for i in result:
@@ -321,7 +293,6 @@ def DelEntry(t):
 
         #####* Printing Options #####
         ###? Clearing the Screen ###
-        ClearScreen()
 
         ###? Options ###
         for i in result:
@@ -380,7 +351,6 @@ def CopyEntry(t):
 
         #####* Printing Options #####
         ###? Clearing the Screen ###
-        ClearScreen()
 
         ###? Options ###
         for i in result:
@@ -409,7 +379,6 @@ def CopyEntry(t):
                 cur.execute(rf"select Email from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0]
                 if result == "":
-                    ClearScreen()
                     print(f"The email in {name} does not exist.")
                     continue
                 pyperclip.copy(result)
@@ -424,7 +393,6 @@ def CopyEntry(t):
                 cur.execute(rf"select Username from {t} where IndexNo={choice}")
                 result = cur.fetchall()[0][0]
                 if result == "":
-                    ClearScreen()
                     print(f"The Username in {name} does not exist.")
                     continue
                 pyperclip.copy(result)
@@ -440,7 +408,6 @@ def CopyEntry(t):
                 result = cur.fetchall()[0][0][2:-1]
                 decPass = fernet.decrypt(result).decode("utf-8")
                 if result == "":
-                    ClearScreen()
                     print(f"The Password in {name} does not exist.")
                     continue
                 print(decPass)
@@ -464,7 +431,6 @@ def PrintOptions():
         global minimalStyle
 
         ####* Clearing the Screen ####
-        ClearScreen()
         ####* Printing Options ####
         choice = select(
             "What is your choice?",
@@ -488,17 +454,8 @@ def PrintOptions():
 
 ###################! Connecting To SQL ###################
 if __name__ == "__main__":
-    #####* Clearing the Screen #####
-    ClearScreen()
-
-    #####* Loading bar #####
-    StatBar(2, desc="[cyan]Loading Password Manager")
-
     #####* Encryption #####
     encryption()
-
-    #####* Connecting To SQLite3 #####
-    conSQL()
 
     #####* Printing Options #####
     PrintOptions()
