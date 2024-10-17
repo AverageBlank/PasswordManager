@@ -33,7 +33,7 @@ Make sure you have Python installed on your system.
 
    ```bash
    python -m venv venv
-   source venv/Scripts/activate  # On powershell use `source venv\bin\activate`
+   source venv/bin/activate  # On powershell use `source venv\source\activate.ps1`
    ```
 
 3. **Install the required libraries**
